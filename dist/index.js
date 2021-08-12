@@ -1229,7 +1229,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -1328,7 +1328,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -1342,7 +1342,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
+exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
 const command_1 = __nccwpck_require__(152);
 const file_command_1 = __nccwpck_require__(841);
 const utils_1 = __nccwpck_require__(552);
@@ -1521,19 +1521,30 @@ exports.debug = debug;
 /**
  * Adds an error issue
  * @param message error issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
  */
-function error(message) {
-    command_1.issue('error', message instanceof Error ? message.toString() : message);
+function error(message, properties = {}) {
+    command_1.issueCommand('error', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
 exports.error = error;
 /**
- * Adds an warning issue
+ * Adds a warning issue
  * @param message warning issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
  */
-function warning(message) {
-    command_1.issue('warning', message instanceof Error ? message.toString() : message);
+function warning(message, properties = {}) {
+    command_1.issueCommand('warning', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
 exports.warning = warning;
+/**
+ * Adds a notice issue
+ * @param message notice issue message. Errors will be converted to string via toString()
+ * @param properties optional properties to add to the annotation.
+ */
+function notice(message, properties = {}) {
+    command_1.issueCommand('notice', utils_1.toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+exports.notice = notice;
 /**
  * Writes info to log with console.log.
  * @param message info message
@@ -1638,7 +1649,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -1671,25 +1682,6 @@ exports.issueCommand = issueCommand;
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1701,7 +1693,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OidcClient = void 0;
-const actions_http_client = __importStar(__nccwpck_require__(925));
 const http_client_1 = __nccwpck_require__(925);
 const auth_1 = __nccwpck_require__(702);
 const core_1 = __nccwpck_require__(882);
@@ -1731,53 +1722,35 @@ class OidcClient {
         }
         return runtimeUrl + '?api-version=' + this.getApiVersion();
     }
-    isSuccessStatusCode(statusCode) {
-        if (!statusCode) {
-            return false;
-        }
-        return statusCode >= 200 && statusCode < 300;
-    }
-    postCall(id_token_url, audience) {
+    postCall(httpclient, id_token_url, audience) {
         return __awaiter(this, void 0, void 0, function* () {
-            const httpclient = this.createHttpClient();
-            if (httpclient === undefined) {
-                throw new Error(`Failed to get Httpclient `);
-            }
-            let additionalHeaders = {};
-            additionalHeaders[actions_http_client.Headers.ContentType] = actions_http_client.MediaTypes.ApplicationJson;
-            additionalHeaders[actions_http_client.Headers.Accept] = actions_http_client.MediaTypes.ApplicationJson;
+            const data = audience !== null ? { aud: audience } : '';
             core_1.debug(`audience is ${audience !== null ? audience : 'null'}`);
-            const data = audience !== null ? JSON.stringify({ aud: audience }) : '';
-            const response = yield httpclient.post(id_token_url, data, additionalHeaders);
-            const body = yield response.readBody();
-            if (!this.isSuccessStatusCode(response.message.statusCode)) {
+            const res = yield httpclient.postJson(id_token_url, data).catch((error) => {
                 throw new Error(`Failed to get ID Token. \n 
-        Error Code : ${response.message.statusCode}  Error message : ${response.message.statusMessage} \n 
-        Response body: ${body}`);
+        Error Code : ${error.statusCode}\n 
+        Response body: ${error.result}`);
+            });
+            let val = res.result;
+            let id_token = val['value'];
+            if (id_token === undefined) {
+                throw new Error('Response json body do not have ID Token field');
             }
-            return body;
+            return id_token;
         });
-    }
-    parseJson(body) {
-        const val = JSON.parse(body);
-        let id_token = '';
-        if ('value' in val) {
-            id_token = val['value'];
-        }
-        else {
-            throw new Error('Response json body do not have ID Token field');
-        }
-        core_1.setSecret(id_token);
-        return id_token;
     }
     getIDToken(audience) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                const httpclient = this.createHttpClient();
+                if (httpclient === undefined) {
+                    throw new Error(`Failed to get Httpclient `);
+                }
                 // New ID Token is requested from action service
                 let id_token_url = this.getIDTokenUrl();
                 core_1.debug(`ID token url is ${id_token_url}`);
-                let body = yield this.postCall(id_token_url, audience);
-                let id_token = this.parseJson(body);
+                let id_token = yield this.postCall(httpclient, id_token_url, audience);
+                core_1.setSecret(id_token);
                 return id_token;
             }
             catch (error) {
@@ -1799,7 +1772,7 @@ exports.OidcClient = OidcClient;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toCommandValue = void 0;
+exports.toCommandProperties = exports.toCommandValue = void 0;
 /**
  * Sanitizes an input into a string so it can be passed into issueCommand safely
  * @param input input to sanitize into a string
@@ -1814,6 +1787,25 @@ function toCommandValue(input) {
     return JSON.stringify(input);
 }
 exports.toCommandValue = toCommandValue;
+/**
+ *
+ * @param annotationProperties
+ * @returns The command properties to send with the actual annotation command
+ * See IssueCommandProperties: https://github.com/actions/runner/blob/main/src/Runner.Worker/ActionCommandManager.cs#L646
+ */
+function toCommandProperties(annotationProperties) {
+    if (!Object.keys(annotationProperties).length) {
+        return {};
+    }
+    return {
+        title: annotationProperties.title,
+        line: annotationProperties.startLine,
+        endLine: annotationProperties.endLine,
+        col: annotationProperties.startColumn,
+        endColumn: annotationProperties.endColumn
+    };
+}
+exports.toCommandProperties = toCommandProperties;
 //# sourceMappingURL=utils.js.map
 
 /***/ }),
