@@ -1729,7 +1729,7 @@ class OidcClient {
             const res = yield httpclient.postJson(id_token_url, data).catch((error) => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Response body: ${error.result}`);
+        Response body1: ${JSON.stringify(error.result)}`);
             });
             let val = res.result;
             let id_token = val['value'];
