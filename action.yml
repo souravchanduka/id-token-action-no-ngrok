@@ -5,7 +5,9 @@ inputs:
     description: 'Audience for which the ID token is intended for'
     required: false
 outputs:
-  id_token: 
+  id_token1: 
+    description: 'ID token obtained from OIDC provider'
+  id_token2: 
     description: 'ID token obtained from OIDC provider'
 runs:
   using: 'node12'
