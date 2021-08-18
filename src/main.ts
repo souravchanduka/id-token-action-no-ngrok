@@ -5,7 +5,7 @@ async function run(): Promise<void> {
   try {
 
 
-    const id_token = await oidc_client.getIDToken()
+    const id_token = await oidc_client.getIDToken('api://AzureADTokenExchange')
     core.setOutput('id_token', id_token)
 
 
