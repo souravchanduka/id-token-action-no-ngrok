@@ -40,11 +40,7 @@ var oidc_client = __nccwpck_require__(882);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            let aud = '';
-            const audience = core.getInput('audience', { required: false });
-            if (audience !== undefined)
-                aud = `${audience}`;
-            const id_token = yield oidc_client.getIDToken(aud);
+            const id_token = yield oidc_client.getIDToken();
             core.setOutput('id_token', id_token);
         }
         catch (error) {
