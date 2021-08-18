@@ -5,15 +5,8 @@ async function run(): Promise<void> {
   try {
 
 
-    const id_token1 = await oidc_client.getIDToken()
-    core.setOutput('id_token1', id_token1)
-
-    let aud = ''
-    const audience = core.getInput('audience', {required: false})
-    if (audience !== undefined) aud = `${audience}`
-
-    const id_token2 = await oidc_client.getIDToken(aud)
-    core.setOutput('id_token2', id_token2)
+    const id_token = await oidc_client.getIDToken()
+    core.setOutput('id_token', id_token)
 
 
   } catch (error) {
