@@ -7,6 +7,8 @@ inputs:
 outputs:
   id_token: 
     description: 'ID token obtained from OIDC provider'
+  id_token1: 
+    description: 'ID token obtained from OIDC provider'
 runs:
   using: 'node12'
   main: 'dist/index.js'
