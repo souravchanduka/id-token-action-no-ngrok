@@ -40,11 +40,11 @@ var oidc_client = __nccwpck_require__(882);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const id_token = yield oidc_client.getIDToken();
-            core.setOutput('id_token', id_token);
+            //const id_token = await oidc_client.getIDToken()
+            //core.setOutput('id_token', id_token)
             const audience = core.getInput('audience', { required: false });
-            const id_token1 = yield oidc_client.getIDToken(audience);
-            core.setOutput('id_token1', id_token1);
+            const id_token = yield oidc_client.getIDToken(audience);
+            core.setOutput('id_token', id_token);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -1616,7 +1616,7 @@ function getState(name) {
     return process.env[`STATE_${name}`] || '';
 }
 exports.getState = getState;
-function getIDToken(aud = undefined) {
+function getIDToken(aud) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield oidc_utils_1.OidcClient.getIDToken(aud);
     });
@@ -1696,13 +1696,11 @@ const auth_1 = __nccwpck_require__(702);
 const core_1 = __nccwpck_require__(882);
 class OidcClient {
     static createHttpClient(allowRetry = true, maxRetry = 10) {
-        let requestOptions = {
+        const requestOptions = {
             allowRetries: allowRetry,
             maxRetries: maxRetry
         };
-        return new http_client_1.HttpClient('actions/oidc-client', [
-            new auth_1.BearerCredentialHandler(OidcClient.getRuntimeToken())
-        ], requestOptions);
+        return new http_client_1.HttpClient('actions/oidc-client', [new auth_1.BearerCredentialHandler(OidcClient.getRuntimeToken())], requestOptions);
     }
     static getApiVersion() {
         return '2.0';
@@ -1715,22 +1713,25 @@ class OidcClient {
         return token;
     }
     static getIDTokenUrl() {
-        let runtimeUrl = process.env['ACTIONS_ID_TOKEN_REQUEST_URL'];
+        const runtimeUrl = process.env['ACTIONS_ID_TOKEN_REQUEST_URL'];
         if (!runtimeUrl) {
             throw new Error('Unable to get ACTIONS_ID_TOKEN_REQUEST_URL env variable');
         }
-        return runtimeUrl + '?api-version=' + OidcClient.getApiVersion();
+        return `${runtimeUrl}?api-version=${OidcClient.getApiVersion()}`;
     }
-    static postCall(httpclient, id_token_url, data) {
+    static postCall(id_token_url, data) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const res = yield httpclient.postJson(id_token_url, data).catch((error) => {
+            const httpclient = OidcClient.createHttpClient();
+            const res = yield httpclient
+                .postJson(id_token_url, data)
+                .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
         Error Message: ${error.result.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
-            if (id_token === undefined) {
+            if (!id_token) {
                 throw new Error('Response json body do not have ID Token field');
             }
             return id_token;
@@ -1739,13 +1740,12 @@ class OidcClient {
     static getIDToken(audience) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const httpclient = OidcClient.createHttpClient();
                 // New ID Token is requested from action service
                 const id_token_url = OidcClient.getIDTokenUrl();
                 core_1.debug(`ID token url is ${id_token_url}`);
                 const data = { aud: audience };
-                core_1.debug(`audience is ${!!audience ? audience : 'not defined'}`);
-                const id_token = yield OidcClient.postCall(httpclient, id_token_url, data);
+                core_1.debug(`audience is ${audience ? audience : 'not defined'}`);
+                const id_token = yield OidcClient.postCall(id_token_url, data);
                 core_1.setSecret(id_token);
                 return id_token;
             }
